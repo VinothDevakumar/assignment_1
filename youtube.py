@@ -1,6 +1,8 @@
 from googleapiclient.discovery import build
 import pandas as pd
 import streamlit as st
+from streamlit_option_menu import option_menu
+from streamlit_js_eval import streamlit_js_eval
 
 def Api_connect():
     Api_id="AIzaSyBJUZVbB5QxUv2qm3JXFbmoXy5LFp6fqUQ"
@@ -394,13 +396,42 @@ def channel_dropdown():
         data.append(i[0])
     return data
 
+def delete_channel_info(channel_id):
+    conn=db_connect()
+    #channel_id="UCJQJAI7IjbLcpsjWdSzYz0Q"
+    cursor=conn.cursor()
+    del_query4=f'''delete from channels where channel_id=\'{channel_id}\';'''
+    del_query3=f'''delete from playlists where channel_id=\'{channel_id}\';'''
+    del_query2=f'''delete from videos where channel_id=\'{channel_id}\';'''
+    del_query1=f'''delete from comments where video_id in(select video_id from videos where channel_id=\'{channel_id}\');'''
+    cursor.execute(del_query1)
+    print("executing1")
+    cursor.execute(del_query2)
+    print("executing3")
+    cursor.execute(del_query3)
+    cursor.execute(del_query4)
+    conn.commit()
+
+
 with st.sidebar:
-    st.title(":red[YOUTUBE DATA HAVERSTING AND WAREHOUSING]")
-    st.header("Skill Take Away")
-    st.caption("Python Scripting")
-    st.caption("Data Collection")
-    st.caption("API Integration")
-    st.caption("Data Management using Postgres Database")
+    selected=option_menu(
+         menu_title="Menu",
+         options = ["Home","About","Contact"],
+         icons=["house-heart-fill","calendar2-heart-fill","envelope-heart-fill"],
+         menu_icon="hear-eyes-fill",
+         default_index=0
+    )
+    if selected == "Home":
+         st.title(":red[YOUTUBE DATA HAVERSTING AND WAREHOUSING]")
+    if selected == "About":
+        st.header("Skill Take Away")
+        st.caption("Python Scripting")
+        st.caption("Data Collection")
+        st.caption("API Integration")
+        st.caption("Data Management using Postgres Database")
+    if selected == "Contact":
+        st.title("Please connect @vinoth.deva")
+    
 
 show_option=st.radio("SELECT Channel VIEW",("NEW CHANNEL","EXISTING CHANNELS"))
 if show_option=="NEW CHANNEL":
@@ -428,7 +459,20 @@ else:
     selected_channel = st.selectbox("Existing Channel analysis?",options=result)
     st.write("you like",selected_channel,"channel")
     channel_id=selected_channel
-
+    if "button1" not in st.session_state:
+        st.session_state["button1"] = False
+    if "button2" not in st.session_state:
+        st.session_state["button2"] = False
+    if st.button("Delete"):
+        st.session_state["button1"] = not st.session_state["button1"]
+    if st.session_state["button1"]:
+        if st.button("Do you really wanna delete"):
+            st.session_state["button2"] = not st.session_state["button2"]
+            st.write("deleting",selected_channel,"channel")
+            delete_channel_info(selected_channel)
+            streamlit_js_eval(js_expressions="parent.window.location.reload()")
+        elif st.button("NO"):
+            streamlit_js_eval(js_expressions="parent.window.location.reload()")
 
 show_table=st.radio("SELECT THE TABLE FOR VIEW",("CHANNELS","PLAYLISTS","VIDEOS","COMMENTS"))
 if not channel_id:
