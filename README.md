@@ -19,7 +19,7 @@ Step 1: Generate YoutubeAPI Key from Google Cloud project:
   2) After creating your project, make sure the YouTube Data API is one of the services that your application is registered       to use:
       Go to the API Console and select the project that you just registered.
       Visit the Enabled APIs page. In the list of APIs, make sure the status is ON for the YouTube Data API v3.
-  3) Once API Key is generated, copy the key to function APi_connect() funder on file youtube.py.
+  3) Once API Key is generated, copy the key to function APi_connect() on file youtube.py.
 Step 2: Create DB as youtube_data and modify the user name and password under function db_connct() on file youtube.py.
 Step 3: Once the above step is done run the code using the below command.
         streamlit run youtube.py
